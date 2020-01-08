@@ -1,4 +1,5 @@
 import 'package:chatzao/app/modules/chat/chat_module.dart';
+import 'package:chatzao/app/modules/login/login_module.dart';
 import 'package:flutter/material.dart';
 
 class AppWidget extends StatelessWidget {
@@ -9,7 +10,7 @@ class AppWidget extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ChatModule(),
+      home: LoginModule(),
     );
   }
 }

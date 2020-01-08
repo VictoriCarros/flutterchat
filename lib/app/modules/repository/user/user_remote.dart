@@ -4,21 +4,18 @@ import 'package:chatzao/app/model/userfriendlist.dart';
 import 'package:dio/dio.dart';
 
 class UserRemote {
-  //final String _endpoint = "${Constants.ENDPOINT}/api/user/";
-  //final String _endpoint = "${Constants.ENDPOINT}/414oJUu1_";
+  final String _endpoint = "${Constants.ENDPOINT}";
 
   final Dio _dio = Dio();
 
   Future<User> getUser() async {
-    Response response = await _dio.get("http://192.168.0.2:8888/user/1");
+    Response response = await _dio.get("http://10.0.0.174:8888/user/1");
     print("response ${response.data}");
     return User.fromJson(response.data);
   }
 
-  Future<List<UserFriendList>> getUserFriendList() async {
-    Response response = await _dio.get("http://192.168.0.2:8888/friendList/1");
-    //Response response = await _dio.get("${Constants.ENDPOINT}/VkuVmLdyd");
-    print("response ${response.data}");
+  Future<List<UserFriendList>> getUserFriendList(int idUser) async {
+    Response response = await _dio.get("$_endpoint/friendlist/$idUser");
     final list = response.data as List;
     return list.map((i) => UserFriendList.fromJson(i)).toList();
   }

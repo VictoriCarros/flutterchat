@@ -1,37 +1,40 @@
+import 'package:chatzao/app/model/history.dart';
 import 'package:chatzao/app/model/user.dart';
+import 'package:chatzao/app/modules/privatechat/privatechat_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class PrivatechatPage extends StatefulWidget {
   final WebSocketChannel channel =
       IOWebSocketChannel.connect("wss://echo.websocket.org/");
+  final User userLogado;
+  final User friend;
+  final inputController = TextEditingController();
+  final PrivatechatController controller = PrivatechatController();
+
+  PrivatechatPage({Key key, @required this.userLogado, @required this.friend})
+      : super(key: key);
 
   @override
   _PrivatechatPageState createState() => _PrivatechatPageState();
 }
 
 class _PrivatechatPageState extends State<PrivatechatPage> {
-  final List<String> messageList = [];
-  final WebSocketChannel channel;
+  _PrivatechatPageState();
 
-  final inputController = TextEditingController();
-
-  _PrivatechatPageState({this.channel}) {
-    /*channel.stream.listen((data) {
-      setState(() {
-        messageList.add(data);
-      });
-    });*/
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.getHistory(widget.userLogado.id, widget.friend.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    final User user = ModalRoute.of(context).settings.arguments;
-
     return Scaffold(
         appBar: AppBar(
-          title: Text(user.name),
+          title: Text(widget.friend.name),
         ),
         body: Container(
           child: Column(
@@ -42,7 +45,7 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
                   children: <Widget>[
                     Expanded(
                       child: TextField(
-                        controller: inputController,
+                        controller: widget.inputController,
                         decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: "Mensagem"),
@@ -53,66 +56,119 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
                         width: 40,
                         child: FlatButton(
                           onPressed: () {
-                            if (inputController.text.isNotEmpty) {
-                              channel.sink.add(inputController.text);
-                              inputController.text = "";
-                            }
+                            _sendMessage();
                           },
                           padding: EdgeInsets.all(0.0),
-                          child: Image.network(
-                            "https://img.icons8.com/plasticine/2x/sent.png",
-                            width: 30,
-                            fit: BoxFit.cover,
-                          ),
+                          child: Icon(Icons.send),
                         ))
                   ],
                 ),
               ),
-              Expanded(
-                child: getMessageList(),
-                /*
-                  child: StreamBuilder(
-                stream: channel.stream,
+              StreamBuilder(
+                stream: widget.channel.stream,
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    messageList.add(snapshot.data);
-                  }
-
-                  return getMessageList();
+                  return Observer(
+                      builder: (_) => Expanded(child: createList()));
                 },
-              )*/
-              )
+              ),
             ],
           ),
         ));
   }
 
-  ListView getMessageList() {
-    List<Widget> listWidget = [];
+  void _sendMessage() { 
+    if (widget.inputController.text.isNotEmpty) {
+      var hist = History(
+          message: widget.inputController.text,
+          date: DateTime.now().toIso8601String(),
+          idFriend: widget.friend.id,
+          idSender: widget.userLogado.id,
+          idUser: widget.userLogado.id);
 
-    for (String msg in messageList) {
-      listWidget.add(ListTile(
-        title: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              msg,
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-          color: Colors.teal[50],
-          height: 40,
-        ),
-      ));
+      widget.channel.sink.add(hist);
+      widget.controller.updateMessageList(hist);
+      widget.controller.sendMessageToServer(hist);
+      widget.inputController.text = "";
     }
+  }
 
-    return ListView(children: listWidget);
+  ListView createList() {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: widget.controller.messageList != null
+          ? widget.controller.messageList.length
+          : 0,
+      itemBuilder: (context, index) {
+        var message = widget.controller.messageList[index];
+        return message.idSender == widget.userLogado.id
+            ? newUserTile(message)
+            : newFriendTile(message);
+      },
+    );
+  }
+
+  ListTile newUserTile(History message) {
+    return ListTile(
+      title: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+          child: Text(
+            widget.userLogado.name,
+            textAlign: TextAlign.right,
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+        color: Colors.teal[50],
+        height: 40,
+      ),
+      subtitle: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+          child: Text(
+            message.message,
+            textAlign: TextAlign.right,
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+        color: Colors.teal[50],
+        height: 40,
+      ),
+    );
+  }
+
+  ListTile newFriendTile(History message) {
+    return ListTile(
+      title: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+          child: Text(
+            widget.friend.name,
+            textAlign: TextAlign.left,
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+        color: Colors.teal[50],
+        height: 40,
+      ),
+      subtitle: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+          child: Text(
+            message.message,
+            textAlign: TextAlign.left,
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+        color: Colors.teal[50],
+        height: 40,
+      ),
+    );
   }
 
   @override
   void dispose() {
-    inputController.dispose();
-    channel.sink.close();
+    widget.inputController.dispose();
+    widget.channel.sink.close();
     super.dispose();
   }
 }

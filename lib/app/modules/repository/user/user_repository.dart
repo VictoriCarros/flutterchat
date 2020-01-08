@@ -9,7 +9,7 @@ class UserRepository {
     return remote.getUser();
   }
 
-  Future<List<UserFriendList>> getUserFriendList() {
-    return remote.getUserFriendList();
+  Future<List<UserFriendList>> getUserFriendList(int idUser) {
+    return remote.getUserFriendList(idUser);
   }
 }

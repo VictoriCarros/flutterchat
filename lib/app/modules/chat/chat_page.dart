@@ -1,4 +1,3 @@
-import 'package:chatzao/app/model/userfriendlist.dart';
 import 'package:chatzao/app/modules/chat/chat_controller.dart';
 import 'package:chatzao/app/modules/chat/chat_module.dart';
 import 'package:chatzao/app/model/user.dart';
@@ -9,24 +8,32 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'chat_controller.dart';
 
 class ChatPage extends StatefulWidget {
-  final String title;
-  const ChatPage({Key key, this.title = "Chat"}) : super(key: key);
+  final User userLogado;
+
+  ChatPage({Key key, @required this.userLogado}) : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
+  ChatController controller = ChatModule.to.getBloc<ChatController>();
+  _ChatPageState();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.getUserFriendListFromRepo(widget.userLogado.id);
+  }
+
   @override
   Widget build(BuildContext context) {
-    ChatController controller = ChatModule.to.getBloc<ChatController>();
-
     return Scaffold(
       body: Column(
         children: <Widget>[
-          header(),
+          header(widget.userLogado.photo),
           searchBar(controller),
-          chatList(controller)
+          chatList(controller, widget.userLogado)
         ],
       ),
     );
@@ -43,12 +50,12 @@ Widget circleImage(String image) {
       ));
 }
 
-Widget header() {
+Widget header(String photo) {
   return Padding(
       padding: EdgeInsets.only(top: 45.0, left: 12.0),
       child: Row(
         children: <Widget>[
-          circleImage("https://i.imgur.com/BoN9kdC.png"),
+          circleImage(photo),
           SizedBox(width: 10.0),
           Text("Bate-papos",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22.0))
@@ -71,37 +78,28 @@ Widget searchBar(ChatController controller) {
       ));
 }
 
-Widget chatList(ChatController controller) {
+Widget chatList(ChatController controller, User userLogado) {
   return Observer(
-      builder: (_) => FutureBuilder<List<UserFriendList>>(
-          future: controller.getUserFriendListFromRepo(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Expanded(
-                  child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: snapshot.data.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PrivatechatModule(),
-                            settings: RouteSettings(
-                                arguments: snapshot.data[index].user)),
-                      );
-                    },
-                    leading: circleImage('${snapshot.data[index].user.photo}'),
-                    title: Text("${snapshot.data[index].user.name}"),
-                    subtitle: Text("${snapshot.data[index].user.email}"),
-                  );
+      builder: (_) => Expanded(
+              child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: controller.friendList != null
+                ? controller.friendList.length
+                : 0,
+            itemBuilder: (context, index) {
+              var friend = controller.friendList[index];
+              return ListTile(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              PrivatechatModule(userLogado, friend.user)));
                 },
-              ));
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
+                leading: circleImage('${friend.user.photo}'),
+                title: Text("${friend.user.name}"),
+                subtitle: Text("${friend.user.email}"),
               );
-            }
-          }));
+            },
+          )));
 }

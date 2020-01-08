@@ -1,5 +1,5 @@
 library constants;
 
 class Constants {
-  static const String ENDPOINT = "https://next.json-generator.com/api/json/get";
+  static const String ENDPOINT = "http://10.0.0.174:8888";
 }

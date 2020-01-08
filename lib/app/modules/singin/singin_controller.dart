@@ -1,4 +1,7 @@
 import 'package:chatzao/app/model/auth_data.dart';
+import 'package:chatzao/app/model/user.dart';
+import 'package:chatzao/app/modules/chat/chat_module.dart';
+import 'package:chatzao/app/modules/chat/chat_page.dart';
 import 'package:chatzao/app/modules/repository/login/login_repository.dart';
 import 'package:chatzao/app/modules/singup/singup_module.dart';
 import 'package:flutter/cupertino.dart';
@@ -84,7 +87,19 @@ abstract class _SinginBase with Store {
             {print("erro")}
         });*/
 
-    saveAuthData("teste");
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ChatModule(
+              userLogado: User(
+                  email: "email1",
+                  name: "victor",
+                  id: 1,
+                  photo:
+                      "https://i.ytimg.com/vi/5dzAaoHVn54/maxresdefault.jpg"))),
+    );
+
+    //saveAuthData("teste");
   }
 
   void showSingup(BuildContext context) {
