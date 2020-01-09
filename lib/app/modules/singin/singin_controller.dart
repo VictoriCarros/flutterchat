@@ -1,8 +1,7 @@
 import 'package:chatzao/app/model/auth_data.dart';
-import 'package:chatzao/app/model/user.dart';
 import 'package:chatzao/app/modules/chat/chat_module.dart';
-import 'package:chatzao/app/modules/chat/chat_page.dart';
 import 'package:chatzao/app/modules/repository/login/login_repository.dart';
+import 'package:chatzao/app/modules/repository/user/user_repository.dart';
 import 'package:chatzao/app/modules/singup/singup_module.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +16,8 @@ class SinginController = _SinginBase with _$SinginController;
 abstract class _SinginBase with Store {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
-  final LoginRepository _repository = LoginRepository();
+  final LoginRepository _loginRepository = LoginRepository();
+  final UserRepository _userRepository = UserRepository();
 
   Box _authDataBox;
   //Box = Table (mas sem estrutura definida, e pode conter qualquer coisa)
@@ -73,31 +73,24 @@ abstract class _SinginBase with Store {
   }
 
   doLogin(BuildContext context) {
-    /*
-    _repository.doLogin(email.text, password.text).then((data) => {
-          if (data.auth == true)
-            {
-              saveAuthData(data.token),
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomeModule()),
-              )
-            }
-          else
-            {print("erro")}
-        });*/
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ChatModule(
-              userLogado: User(
-                  email: "email1",
-                  name: "victor",
-                  id: 1,
-                  photo:
-                      "https://i.ytimg.com/vi/5dzAaoHVn54/maxresdefault.jpg"))),
-    );
+    _loginRepository
+        .doLogin(email.text, password.text)
+        .then((data) => {
+              if (data.userId != null)
+                {
+                  //saveAuthData(data.token),
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ChatModule(userId: data.userId))),
+                }
+              else
+                {print("usuário/senha inválidos")}
+            })
+        .catchError((e) {
+      print("doLogin error $e");
+    });
 
     //saveAuthData("teste");
   }

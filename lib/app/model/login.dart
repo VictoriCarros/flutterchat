@@ -1,11 +1,13 @@
 class Login {
-  bool auth;
+  int userId;
   String token;
+  int expiresIn;
 
-  Login({this.auth, this.token});
+  Login({this.userId, this.token, this.expiresIn});
 
   Login.fromJson(Map<String, dynamic> json) {
-    auth = json['auth'];
+    userId = json['userId'];
     token = json['token'];
+    expiresIn = json['expiresIn'];
   }
 }

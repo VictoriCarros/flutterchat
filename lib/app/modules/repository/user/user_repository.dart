@@ -5,8 +5,12 @@ import 'package:chatzao/app/modules/repository/user/user_remote.dart';
 class UserRepository {
   UserRemote remote = UserRemote();
 
-  Future<User> getUser() {
-    return remote.getUser();
+  Future<User> getUserById(int id) {
+    return remote.getUserById(id);
+  }
+
+  Future<User> getUserByEmail(String email) {
+    return remote.getUserByEmail(email);
   }
 
   Future<List<UserFriendList>> getUserFriendList(int idUser) {

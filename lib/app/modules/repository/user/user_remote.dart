@@ -8,9 +8,13 @@ class UserRemote {
 
   final Dio _dio = Dio();
 
-  Future<User> getUser() async {
-    Response response = await _dio.get("http://10.0.0.174:8888/user/1");
-    print("response ${response.data}");
+  Future<User> getUserByEmail(String email) async {
+    Response response = await _dio.get("$_endpoint/user/email/$email");
+    return User.fromJson(response.data);
+  }
+
+  Future<User> getUserById(int id) async {
+    Response response = await _dio.get("$_endpoint/user/id/$id");
     return User.fromJson(response.data);
   }
 

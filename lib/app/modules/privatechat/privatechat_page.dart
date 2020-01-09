@@ -39,9 +39,17 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
         body: Container(
           child: Column(
             children: <Widget>[
+              StreamBuilder(
+                stream: widget.channel.stream,
+                builder: (context, snapshot) {
+                  return Observer(
+                      builder: (_) => Expanded(child: createList()));
+                },
+              ),
               Padding(
                 padding: EdgeInsets.all(10.0),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     Expanded(
                       child: TextField(
@@ -52,31 +60,22 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
-                    SizedBox(
-                        width: 40,
-                        child: FlatButton(
-                          onPressed: () {
-                            _sendMessage();
-                          },
-                          padding: EdgeInsets.all(0.0),
-                          child: Icon(Icons.send),
-                        ))
+                    FlatButton(
+                      onPressed: () {
+                        _sendMessage();
+                      },
+                      padding: EdgeInsets.all(0.0),
+                      child: Icon(Icons.send),
+                    )
                   ],
                 ),
-              ),
-              StreamBuilder(
-                stream: widget.channel.stream,
-                builder: (context, snapshot) {
-                  return Observer(
-                      builder: (_) => Expanded(child: createList()));
-                },
               ),
             ],
           ),
         ));
   }
 
-  void _sendMessage() { 
+  void _sendMessage() {
     if (widget.inputController.text.isNotEmpty) {
       var hist = History(
           message: widget.inputController.text,
@@ -95,6 +94,7 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
   ListView createList() {
     return ListView.builder(
       shrinkWrap: true,
+      reverse: true,
       itemCount: widget.controller.messageList != null
           ? widget.controller.messageList.length
           : 0,
@@ -110,17 +110,17 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
   ListTile newUserTile(History message) {
     return ListTile(
       title: Container(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
-          child: Text(
-            widget.userLogado.name,
-            textAlign: TextAlign.right,
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-        color: Colors.teal[50],
-        height: 40,
-      ),
+          color: Colors.teal[50],
+          child: Row(mainAxisSize: MainAxisSize.max, children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 30.0, top: 8.0),
+              child: Text(
+                widget.userLogado.name,
+                textAlign: TextAlign.right,
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ])),
       subtitle: Container(
         child: Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
@@ -131,7 +131,7 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
           ),
         ),
         color: Colors.teal[50],
-        height: 40,
+        // height: 40,
       ),
     );
   }
@@ -148,7 +148,7 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
           ),
         ),
         color: Colors.teal[50],
-        height: 40,
+        //height: 40,
       ),
       subtitle: Container(
         child: Padding(
@@ -160,7 +160,7 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
           ),
         ),
         color: Colors.teal[50],
-        height: 40,
+        //height: 40,
       ),
     );
   }
