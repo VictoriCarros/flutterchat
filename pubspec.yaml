@@ -26,6 +26,8 @@ dependencies:
   hive_flutter: any
   path_provider: ^1.5.1
   web_socket_channel: ^1.0.15
+  intl: ^0.16.1
+
   flutter:
     sdk: flutter
 

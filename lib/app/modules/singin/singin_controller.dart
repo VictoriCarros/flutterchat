@@ -73,6 +73,7 @@ abstract class _SinginBase with Store {
   }
 
   doLogin(BuildContext context) {
+    /*
     _loginRepository
         .doLogin(email.text, password.text)
         .then((data) => {
@@ -91,6 +92,12 @@ abstract class _SinginBase with Store {
         .catchError((e) {
       print("doLogin error $e");
     });
+    */
+
+    if (email.text == "email3" && password.text == "123") {
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => ChatModule(userId: 3)));
+    }
 
     //saveAuthData("teste");
   }

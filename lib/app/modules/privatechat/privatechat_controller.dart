@@ -10,6 +10,9 @@ abstract class _PrivatechatBase with Store {
   final HistoryRepository _repository = HistoryRepository();
 
   @observable
+  bool messageDateVisibility = false;
+
+  @observable
   List<History> messageList;
 
   List<History> _messageList = [];
@@ -30,5 +33,11 @@ abstract class _PrivatechatBase with Store {
   updateMessageList(History history) {
     _messageList.add(history);
     messageList = _messageList;
+  }
+
+  @action
+  switchMessageDateVisibility() {
+    messageDateVisibility = messageDateVisibility ? false : true;
+    print("visibility - $messageDateVisibility");
   }
 }

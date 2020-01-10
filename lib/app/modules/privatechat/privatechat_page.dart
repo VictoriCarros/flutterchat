@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:chatzao/app/utils/string_utils.dart';
 
 class PrivatechatPage extends StatefulWidget {
   final WebSocketChannel channel =
@@ -55,8 +56,19 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
                       child: TextField(
                         controller: widget.inputController,
                         decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Mensagem"),
+                            fillColor: Colors.grey.withOpacity(0.2),
+                            filled: true,
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.grey.withOpacity(0.6),
+                                    width: 0.0),
+                                borderRadius: BorderRadius.circular(20)),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.grey.withOpacity(0.6),
+                                    width: 0.0),
+                                borderRadius: BorderRadius.circular(20)),
+                            hintText: "Aa"),
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
@@ -99,7 +111,8 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
           ? widget.controller.messageList.length
           : 0,
       itemBuilder: (context, index) {
-        var message = widget.controller.messageList[index];
+        var reversedList = widget.controller.messageList.reversed.toList();
+        var message = reversedList[index];
         return message.idSender == widget.userLogado.id
             ? newUserTile(message)
             : newFriendTile(message);
@@ -109,59 +122,87 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
 
   ListTile newUserTile(History message) {
     return ListTile(
-      title: Container(
-          color: Colors.teal[50],
-          child: Row(mainAxisSize: MainAxisSize.max, children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 30.0, top: 8.0),
-              child: Text(
-                widget.userLogado.name,
-                textAlign: TextAlign.right,
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-          ])),
-      subtitle: Container(
+      onTap: () {
+        widget.controller.switchMessageDateVisibility();
+      },
+      title: Column(children: <Widget>[
+        Align(
+          alignment: Alignment.center,
+          child: Observer(
+              builder: (_) => Visibility(
+                    child: Text(
+                      "${message.date.toFormatedDate()}",
+                      style: TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.blueGrey.withOpacity(0.7)),
+                    ),
+                    visible: widget.controller.messageDateVisibility,
+                  )),
+        ),
+        SizedBox(height: 10),
+        Align(
+            alignment: Alignment.bottomRight,
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.blueGrey,
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(16.0),
+                          topLeft: Radius.circular(16.0),
+                          bottomLeft: Radius.circular(16.0))),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      message.message,
+                      textAlign: TextAlign.right,
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
+            ))
+      ]),
+      /*subtitle: Container(
+        decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.1),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(16.0),
+            )),
+        height: 40,
         child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+          padding: const EdgeInsets.only(left: 8.0, right: 16.0, top: 8.0),
           child: Text(
             message.message,
             textAlign: TextAlign.right,
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 16, color: Colors.white),
           ),
         ),
-        color: Colors.teal[50],
-        // height: 40,
-      ),
+      ),*/
     );
   }
 
   ListTile newFriendTile(History message) {
     return ListTile(
-      title: Container(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
-          child: Text(
-            widget.friend.name,
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 16),
+      title: Wrap(children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+              color: Colors.lightBlue,
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(16.0),
+                  topLeft: Radius.circular(16.0),
+                  bottomRight: Radius.circular(16.0))),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              message.message,
+              textAlign: TextAlign.right,
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
           ),
-        ),
-        color: Colors.teal[50],
-        //height: 40,
-      ),
-      subtitle: Container(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
-          child: Text(
-            message.message,
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-        color: Colors.teal[50],
-        //height: 40,
-      ),
+        )
+      ]),
     );
   }
 
