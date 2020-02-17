@@ -22,7 +22,7 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     controller.getUserById(widget.userId);
-    controller.getUserFriendListFromRepo(widget.userId);
+    controller.getFriendist(widget.userId);
   }
 
   @override
@@ -81,11 +81,9 @@ class _ChatPageState extends State<ChatPage> {
         builder: (_) => Expanded(
                 child: ListView.builder(
               shrinkWrap: true,
-              itemCount: controller.friendList != null
-                  ? controller.friendList.length
-                  : 0,
+              itemCount: controller.list != null ? controller.list.length : 0,
               itemBuilder: (context, index) {
-                var friend = controller.friendList[index];
+                var friend = controller.list[index];
                 return ListTile(
                   onTap: () {
                     Navigator.push(

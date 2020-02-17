@@ -8,4 +8,45 @@ part of 'singin_controller.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$SinginController on _SinginBase, Store {}
+mixin _$SinginController on _SinginBase, Store {
+  final _$resultAtom = Atom(name: '_SinginBase.result');
+
+  @override
+  Result get result {
+    _$resultAtom.context.enforceReadPolicy(_$resultAtom);
+    _$resultAtom.reportObserved();
+    return super.result;
+  }
+
+  @override
+  set result(Result value) {
+    _$resultAtom.context.conditionallyRunInAction(() {
+      super.result = value;
+      _$resultAtom.reportChanged();
+    }, _$resultAtom, name: '${_$resultAtom.name}_set');
+  }
+
+  final _$_loginResponseAtom = Atom(name: '_SinginBase._loginResponse');
+
+  @override
+  LoginResponse get _loginResponse {
+    _$_loginResponseAtom.context.enforceReadPolicy(_$_loginResponseAtom);
+    _$_loginResponseAtom.reportObserved();
+    return super._loginResponse;
+  }
+
+  @override
+  set _loginResponse(LoginResponse value) {
+    _$_loginResponseAtom.context.conditionallyRunInAction(() {
+      super._loginResponse = value;
+      _$_loginResponseAtom.reportChanged();
+    }, _$_loginResponseAtom, name: '${_$_loginResponseAtom.name}_set');
+  }
+
+  final _$doLoginAsyncAction = AsyncAction('doLogin');
+
+  @override
+  Future doLogin(BuildContext context) {
+    return _$doLoginAsyncAction.run(() => super.doLogin(context));
+  }
+}

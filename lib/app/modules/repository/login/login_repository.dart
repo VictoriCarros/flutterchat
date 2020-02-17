@@ -1,11 +1,11 @@
+import 'package:chatzao/app/commom.dart';
 import 'package:chatzao/app/modules/repository/login/login_remote.dart';
 
-import '../../../model/login.dart';
-
 class LoginRepository {
-  LoginRemote remote = LoginRemote();
+  LoginRemote _loginRemote;
+  LoginRepository(this._loginRemote);
 
-  Future<Login> doLogin(String email, String password) {
-    return remote.doLogin(email, password);
+  Future<Result> doLogin(String email, String password) {
+    return _loginRemote.doLogin(email, password);
   }
 }

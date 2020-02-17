@@ -1,3 +1,4 @@
+import 'package:chatzao/app/commom.dart';
 import 'package:chatzao/app/model/user.dart';
 import 'package:chatzao/app/model/userfriendlist.dart';
 import 'package:chatzao/app/modules/repository/user/user_repository.dart';
@@ -8,23 +9,32 @@ part 'chat_controller.g.dart';
 class ChatController = _ChatBase with _$ChatController;
 
 abstract class _ChatBase with Store {
-  final UserRepository _repository = UserRepository();
+  UserRepository _userRepository;
 
   @observable
   User userLogado;
 
   @observable
-  List<UserFriendList> friendList;
+  ObservableList<UserFriendList> list;
+
+  @observable
+  Result result;
 
   @action
-  Future getUserFriendListFromRepo(int idUser) async {
-    List<UserFriendList> response = await _repository.getUserFriendList(idUser);
-    friendList = response;
+  Future getFriendist(int idUser) async {
+    // List<UserFriendList> response =
+    //     await _userRepository.getUserFriendList(idUser);
+    // friendList = response;
+    result = Result.loading();
+    result = await _userRepository.getUserFriendList(idUser);
+
+    if (result.hasSuccessData())
+      list = result.getSuccessData() as ObservableList<UserFriendList>;
   }
 
   @action
   Future getUserById(int idUser) async {
-    User response = await _repository.getUserById(idUser);
+    User response = await _userRepository.getUserById(idUser);
     userLogado = response;
   }
 }

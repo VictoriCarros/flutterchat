@@ -1,3 +1,4 @@
+import 'package:chatzao/app/commom.dart';
 import 'package:chatzao/app/model/user.dart';
 import 'package:chatzao/app/model/userfriendlist.dart';
 import 'package:chatzao/app/modules/repository/user/user_remote.dart';
@@ -13,7 +14,7 @@ class UserRepository {
     return remote.getUserByEmail(email);
   }
 
-  Future<List<UserFriendList>> getUserFriendList(int idUser) {
+  Future<Result> getUserFriendList(int idUser) {
     return remote.getUserFriendList(idUser);
   }
 }

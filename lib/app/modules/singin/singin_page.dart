@@ -1,4 +1,5 @@
 import 'package:chatzao/app/modules/singin/singin_controller.dart';
+import 'package:chatzao/app/modules/singin/singin_module.dart';
 import 'package:flutter/material.dart';
 
 class SinginPage extends StatefulWidget {
@@ -14,7 +15,7 @@ class _SinginPageState extends State<SinginPage> {
 
   @override
   Widget build(BuildContext context) {
-    SinginController singinController = SinginController();
+    SinginController _controller = SinginModule.to.getBloc();
     //singinController.autoLogin();
 
     return Scaffold(
@@ -33,7 +34,7 @@ class _SinginPageState extends State<SinginPage> {
                 return null;
               },
               autofocus: true,
-              controller: singinController.email,
+              controller: _controller.emailController,
               decoration: InputDecoration(
                   border: new OutlineInputBorder(
                       borderRadius: const BorderRadius.all(
@@ -50,7 +51,7 @@ class _SinginPageState extends State<SinginPage> {
                 }
                 return null;
               },
-              controller: singinController.password,
+              controller: _controller.passwordController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: "Senha",
@@ -86,7 +87,7 @@ class _SinginPageState extends State<SinginPage> {
                   textColor: Colors.white,
                   onPressed: () {
                     if (_singinForm.currentState.validate()) {
-                      singinController.doLogin(context);
+                      _controller.doLogin(context);
 
                       Scaffold.of(context).showSnackBar(
                           SnackBar(content: Text('Login ou senha inválidos')));
@@ -104,7 +105,7 @@ class _SinginPageState extends State<SinginPage> {
                   color: Color.fromRGBO(0, 0, 0, 0.3),
                   textColor: Colors.white,
                   onPressed: () {
-                    singinController.showSingup(context);
+                    _controller.showSingup(context);
                   },
                   child: Text("Novo usuário"),
                 ))

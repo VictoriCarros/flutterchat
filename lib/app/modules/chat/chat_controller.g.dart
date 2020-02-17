@@ -26,30 +26,45 @@ mixin _$ChatController on _ChatBase, Store {
     }, _$userLogadoAtom, name: '${_$userLogadoAtom.name}_set');
   }
 
-  final _$friendListAtom = Atom(name: '_ChatBase.friendList');
+  final _$listAtom = Atom(name: '_ChatBase.list');
 
   @override
-  List<UserFriendList> get friendList {
-    _$friendListAtom.context.enforceReadPolicy(_$friendListAtom);
-    _$friendListAtom.reportObserved();
-    return super.friendList;
+  ObservableList<UserFriendList> get list {
+    _$listAtom.context.enforceReadPolicy(_$listAtom);
+    _$listAtom.reportObserved();
+    return super.list;
   }
 
   @override
-  set friendList(List<UserFriendList> value) {
-    _$friendListAtom.context.conditionallyRunInAction(() {
-      super.friendList = value;
-      _$friendListAtom.reportChanged();
-    }, _$friendListAtom, name: '${_$friendListAtom.name}_set');
+  set list(ObservableList<UserFriendList> value) {
+    _$listAtom.context.conditionallyRunInAction(() {
+      super.list = value;
+      _$listAtom.reportChanged();
+    }, _$listAtom, name: '${_$listAtom.name}_set');
   }
 
-  final _$getUserFriendListFromRepoAsyncAction =
-      AsyncAction('getUserFriendListFromRepo');
+  final _$resultAtom = Atom(name: '_ChatBase.result');
 
   @override
-  Future getUserFriendListFromRepo(int idUser) {
-    return _$getUserFriendListFromRepoAsyncAction
-        .run(() => super.getUserFriendListFromRepo(idUser));
+  Result get result {
+    _$resultAtom.context.enforceReadPolicy(_$resultAtom);
+    _$resultAtom.reportObserved();
+    return super.result;
+  }
+
+  @override
+  set result(Result value) {
+    _$resultAtom.context.conditionallyRunInAction(() {
+      super.result = value;
+      _$resultAtom.reportChanged();
+    }, _$resultAtom, name: '${_$resultAtom.name}_set');
+  }
+
+  final _$getFriendistAsyncAction = AsyncAction('getFriendist');
+
+  @override
+  Future getFriendist(int idUser) {
+    return _$getFriendistAsyncAction.run(() => super.getFriendist(idUser));
   }
 
   final _$getUserByIdAsyncAction = AsyncAction('getUserById');

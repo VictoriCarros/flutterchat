@@ -1,105 +1,44 @@
-import 'package:chatzao/app/model/auth_data.dart';
+import 'package:chatzao/app/model/login_response.dart';
 import 'package:chatzao/app/modules/chat/chat_module.dart';
 import 'package:chatzao/app/modules/repository/login/login_repository.dart';
-import 'package:chatzao/app/modules/repository/user/user_repository.dart';
 import 'package:chatzao/app/modules/singup/singup_module.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:mobx/mobx.dart';
-import 'package:path_provider/path_provider.dart';
+
+import '../../commom.dart';
 
 part 'singin_controller.g.dart';
 
 class SinginController = _SinginBase with _$SinginController;
 
 abstract class _SinginBase with Store {
-  TextEditingController email = TextEditingController();
-  TextEditingController password = TextEditingController();
-  final LoginRepository _loginRepository = LoginRepository();
-  final UserRepository _userRepository = UserRepository();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  LoginRepository _loginRepository;
+  _SinginBase(this._loginRepository);
 
-  Box _authDataBox;
-  //Box = Table (mas sem estrutura definida, e pode conter qualquer coisa)
-  //Boxes can also be encrypted to store sensitive data
+  @observable
+  Result result;
 
-  Future _openBox(String token) async {
-    Hive.registerAdapter(AuthDataAdapter(), 3);
+  @observable
+  LoginResponse _loginResponse;
 
-    var dir = await getApplicationDocumentsDirectory();
-    Hive.init(dir.path);
-
-    _authDataBox = await Hive.openBox('authBox');
-
-    AuthData authData =
-        AuthData(email: email.text, password: password.text, token: token);
-
-    int lastIndex = _authDataBox.toMap().length - 1;
-    if (lastIndex < 0) {
-      _authDataBox.add(authData);
-    } else {
-      print("email encontrado na box: ${authData.email}");
-      _authDataBox.putAt(lastIndex, _authDataBox);
-    }
-  }
-
-  @override
   void dispose() {
-    email.dispose();
-    password.dispose();
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
-  /* autoLogin() {
-    WatchBoxBuilder(
-      box: _authDataBox,
-      builder: (context, box) {
-        Map<dynamic, dynamic> raw = box.toMap();
-        List list = raw.values.toList();
-        if (list.length > 0) {
-          AuthData authData = list[0];
-          email.text = authData.email;
-          password.text = authData.password;
+  @action
+  Future doLogin(BuildContext context) async {
+    result = Result.loading();
+    result = await _loginRepository.doLogin(
+        emailController.text, passwordController.text);
 
-          doLogin(context);
-        }
-      },
-    );
-  }
-*/
-
-  saveAuthData(String token) {
-    _openBox(token);
-  }
-
-  doLogin(BuildContext context) {
-    /*
-    _loginRepository
-        .doLogin(email.text, password.text)
-        .then((data) => {
-              if (data.userId != null)
-                {
-                  //saveAuthData(data.token),
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ChatModule(userId: data.userId))),
-                }
-              else
-                {print("usuário/senha inválidos")}
-            })
-        .catchError((e) {
-      print("doLogin error $e");
-    });
-    */
-
-    if (email.text == "email3" && password.text == "123") {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => ChatModule(userId: 3)));
+    if (result.hasSuccessData()) {
+      _loginResponse = result.getSuccessData() as LoginResponse;
     }
-
-    //saveAuthData("teste");
   }
 
   void showSingup(BuildContext context) {

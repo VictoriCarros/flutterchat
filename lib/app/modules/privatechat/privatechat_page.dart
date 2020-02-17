@@ -3,13 +3,9 @@ import 'package:chatzao/app/model/user.dart';
 import 'package:chatzao/app/modules/privatechat/privatechat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:chatzao/app/utils/string_utils.dart';
 
 class PrivatechatPage extends StatefulWidget {
-  final WebSocketChannel channel =
-      IOWebSocketChannel.connect("wss://echo.websocket.org/");
   final User userLogado;
   final User friend;
   final inputController = TextEditingController();
@@ -41,7 +37,7 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
           child: Column(
             children: <Widget>[
               StreamBuilder(
-                stream: widget.channel.stream,
+                stream: widget.controller.channel.stream,
                 builder: (context, snapshot) {
                   return Observer(
                       builder: (_) => Expanded(child: createList()));
@@ -96,7 +92,7 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
           idSender: widget.userLogado.id,
           idUser: widget.userLogado.id);
 
-      widget.channel.sink.add(hist);
+      widget.controller.channel.sink.add(hist);
       widget.controller.updateMessageList(hist);
       widget.controller.sendMessageToServer(hist);
       widget.inputController.text = "";
@@ -139,7 +135,8 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
                     visible: widget.controller.messageDateVisibility,
                   )),
         ),
-        SizedBox(height: 10),
+      ]),
+      subtitle: Column(children: <Widget>[
         Align(
             alignment: Alignment.bottomRight,
             child: Wrap(
@@ -164,28 +161,30 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
               ],
             ))
       ]),
-      /*subtitle: Container(
-        decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.1),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(16.0),
-            )),
-        height: 40,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 16.0, top: 8.0),
-          child: Text(
-            message.message,
-            textAlign: TextAlign.right,
-            style: TextStyle(fontSize: 16, color: Colors.white),
-          ),
-        ),
-      ),*/
     );
   }
 
   ListTile newFriendTile(History message) {
     return ListTile(
-      title: Wrap(children: <Widget>[
+      onTap: () {
+        widget.controller.switchMessageDateVisibility();
+      },
+      title: Column(children: <Widget>[
+        Align(
+          alignment: Alignment.center,
+          child: Observer(
+              builder: (_) => Visibility(
+                    child: Text(
+                      "${message.date.toFormatedDate()}",
+                      style: TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.blueGrey.withOpacity(0.7)),
+                    ),
+                    visible: widget.controller.messageDateVisibility,
+                  )),
+        ),
+      ]),
+      subtitle: Wrap(children: <Widget>[
         Container(
           decoration: BoxDecoration(
               color: Colors.lightBlue,
@@ -209,7 +208,7 @@ class _PrivatechatPageState extends State<PrivatechatPage> {
   @override
   void dispose() {
     widget.inputController.dispose();
-    widget.channel.sink.close();
+    widget.controller.channel.sink.close();
     super.dispose();
   }
 }

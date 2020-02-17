@@ -1,6 +1,8 @@
 import 'package:chatzao/app/model/history.dart';
 import 'package:chatzao/app/modules/repository/history/history_repository.dart';
 import 'package:mobx/mobx.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'privatechat_controller.g.dart';
 
@@ -16,6 +18,9 @@ abstract class _PrivatechatBase with Store {
   List<History> messageList;
 
   List<History> _messageList = [];
+
+  final WebSocketChannel channel =
+      IOWebSocketChannel.connect("wss://echo.websocket.org/");
 
   @action
   Future sendMessageToServer(History history) async {
